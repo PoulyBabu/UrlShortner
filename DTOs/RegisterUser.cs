@@ -7,6 +7,7 @@ public class RegisterUser
     [Required(ErrorMessage = "Username is required")]
     [MaxLength(50, ErrorMessage = "Username cannot exceed 50 characters")]
     public string Username { get; set; } = string.Empty;
+    
     [Required(ErrorMessage ="Email is required")]
     [EmailAddress(ErrorMessage = "Please enter a valid email address")]
     public string Email { get; set;} = string.Empty;

@@ -16,13 +16,14 @@ public class UrlService : IUrlService {
         _context = context;
     }
 
-    public async Task<ShortenUrlResponse> ShortenUrlAsync(ShortenUrlRequest request, string baseUrl)
+    public async Task<ShortenUrlResponse> ShortenUrlAsync(ShortenUrlRequest request, string baseUrl,int UserId)
     {
         var code = await GenerateUniqueCodeAsync();
         var entity = new ShortUrl
         {
             LongUrl = request.LongUrl,
-            code = code
+            code = code,
+            UserId = UserId
         };
         _context.ShortUrls.Add(entity);
         await _context.SaveChangesAsync();
@@ -47,9 +48,9 @@ public class UrlService : IUrlService {
         return entity.LongUrl;
     }
 
-    public async Task<IEnumerable<ShortenUrlResponse>> GetAllShortUrlsAsync(string baseUrl)
+    public async Task<IEnumerable<ShortenUrlResponse>> GetAllShortUrlsAsync(string baseUrl,int UserId)
     {
-        var urls = await _context.ShortUrls.ToListAsync();
+        var urls = await _context.ShortUrls.Where(u=> u.UserId == UserId).ToListAsync();
         return urls.Select(u => new ShortenUrlResponse
         {
             code = u.code,

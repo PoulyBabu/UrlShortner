@@ -11,7 +11,8 @@ namespace UrlShortner.Controllers;
 public class UrlController :ControllerBase
 {
     private readonly IUrlService _urlService;
-    private readonly string baseUrl = "${Request.Scheme}://{Request.Host}";
+    private  string baseUrl => $"{Request.Scheme}://{Request.Host}";
+    int UserId = 1;
 
     public UrlController(IUrlService urlService){
         _urlService = urlService;
@@ -19,7 +20,7 @@ public class UrlController :ControllerBase
     [HttpPost("shorten")]
     public async Task<IActionResult> Shorten([FromBody] ShortenUrlRequest request){
       
-      var response = await _urlService.ShortenUrlAsync(request,baseUrl);
+      var response = await _urlService.ShortenUrlAsync(request,baseUrl,UserId);
       return Ok(response);
    }
 
@@ -37,7 +38,7 @@ public class UrlController :ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllShortUrls()
     {
-        var urls = await _urlService.GetAllShortUrlsAsync(baseUrl);
+        var urls = await _urlService.GetAllShortUrlsAsync(baseUrl,UserId);
         return Ok(urls);
     }
 }
