@@ -4,27 +4,31 @@ using UrlShortner.DTOs;
 using UrlShortner.Data;
 using UrlShortner.Models;
 using UrlShortner.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 namespace UrlShortner.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UrlController :ControllerBase
 {
     private readonly IUrlService _urlService;
     private  string baseUrl => $"{Request.Scheme}://{Request.Host}";
-    int UserId = 1;
+  
 
     public UrlController(IUrlService urlService){
         _urlService = urlService;
     }
     [HttpPost("shorten")]
     public async Task<IActionResult> Shorten([FromBody] ShortenUrlRequest request){
-      
+      int UserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
       var response = await _urlService.ShortenUrlAsync(request,baseUrl,UserId);
       return Ok(response);
    }
 
     [HttpGet("{code}")]
+    [AllowAnonymous]
     public async Task<IActionResult> RedirectToLongUrl([FromRoute] string code)
     {
         var destinationUrl = await _urlService.GetOriginalUrlAsync(code);
@@ -37,7 +41,7 @@ public class UrlController :ControllerBase
     }
     [HttpGet]
     public async Task<IActionResult> GetAllShortUrls()
-    {
+    {   int UserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var urls = await _urlService.GetAllShortUrlsAsync(baseUrl,UserId);
         return Ok(urls);
     }
